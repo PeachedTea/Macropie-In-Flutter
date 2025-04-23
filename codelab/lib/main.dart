@@ -46,45 +46,115 @@ class MyAppState extends ChangeNotifier {
   }
 
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+// '_' means that the class is private in Dart
+class _MyHomePageState extends State<MyHomePage> {
+
+  var selectedIndex = 0;
+
+
+  @override
+  Widget build(BuildContext context) {
+
+    Widget page;
+  switch (selectedIndex) {
+    case 0:
+      page = GeneratorPage();
+      break;
+    case 1:
+      page = Placeholder();
+      break;
+    default:
+      throw UnimplementedError('no widget for $selectedIndex');
+  }
+
+
+    return Scaffold(
+      body: Row(
+        children: [
+          SafeArea(
+            child: NavigationRail(
+              extended: false,
+              destinations: [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home),
+                  label: Text('Home'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.favorite),
+                  label: Text('Favorites'),
+                ),
+              ],
+              selectedIndex: selectedIndex,
+              onDestinationSelected: (value) {
+                // allows rebuilding of state ('setState()')
+                setState(() {
+                  selectedIndex = value;
+                });
+                selectedIndex = value;
+              },
+            ),
+          ),
+          Expanded(
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: page,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GeneratorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
 
-    return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            Text('A random naming idea:', style: TextStyle(fontWeight: FontWeight.bold)),
-            BigCard(pair: pair),
-            SizedBox(height: 12),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton(onPressed: () {
-                  appState.toggleFavourite();
+    IconData icon;
+    if (appState.favourites.contains(pair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
 
-                }, 
-                child: Text('Favourite'),
-                ),
-                SizedBox(width: 12),
-                ElevatedButton(
-                  onPressed: () {
-                    appState.getNext();
-                    
-                  },
-                  child: Text('Next'),
-                ),
-              ],
-            ),
-        
-          ],
-        ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          BigCard(pair: pair),
+          SizedBox(height: 10),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  appState.toggleFavourite();
+                },
+                icon: Icon(icon),
+                label: Text('Like'),
+              ),
+              SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {
+                  appState.getNext();
+                },
+                child: Text('Next'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
+
 
 class BigCard extends StatelessWidget {
   const BigCard({
