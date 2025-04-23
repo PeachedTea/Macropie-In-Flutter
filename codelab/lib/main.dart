@@ -56,7 +56,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   var selectedIndex = 0;
 
-
   @override
   Widget build(BuildContext context) {
 
@@ -66,12 +65,11 @@ class _MyHomePageState extends State<MyHomePage> {
       page = GeneratorPage();
       break;
     case 1:
-      page = Placeholder();
+      page = FavourtiesPage();
       break;
     default:
       throw UnimplementedError('no widget for $selectedIndex');
   }
-
 
     return Scaffold(
       body: Row(
@@ -155,7 +153,24 @@ class GeneratorPage extends StatelessWidget {
   }
 }
 
+class FavourtiesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var favourites = appState.favourites;
 
+    if (favourites.isEmpty) {
+      return Center(child: Text('Nothing Favourited'),);
+    }
+
+    return ListView (
+        children: [
+          for (var favPair in favourites)
+            ListTile(title: BigCard(pair: favPair))
+        ],
+    );
+  }
+}
 class BigCard extends StatelessWidget {
   const BigCard({
     super.key,
